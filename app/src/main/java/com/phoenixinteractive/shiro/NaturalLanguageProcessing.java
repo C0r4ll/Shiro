@@ -14,6 +14,7 @@ import opennlp.tools.tokenize.WhitespaceTokenizer;
 
 public class NaturalLanguageProcessing {
 
+    //Field Declaration
     Context context;
     POSTaggerME tagger;
     WhitespaceTokenizer whitespaceTokenizer;

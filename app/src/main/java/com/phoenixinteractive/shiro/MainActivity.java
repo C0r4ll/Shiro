@@ -8,24 +8,34 @@ import android.widget.RelativeLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import opennlp.tools.postag.POSSample;
 
 public class MainActivity extends AppCompatActivity {
+
+    //Field Declaration
+    RelativeLayout rLayout;
+    EditText editText;;
+
+    VoiceRecognizer voiceRec;
+    NaturalLanguageProcessing nlp;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
         //initialize Objects
-        RelativeLayout rLayout = findViewById(R.id.mainlayout);
-        EditText editText = findViewById(R.id.editText);
-        VoiceRecognizer voiceRec = new VoiceRecognizer(this, this, editText);
+        rLayout = findViewById(R.id.mainlayout);
+        editText = findViewById(R.id.editText);
+        voiceRec = new VoiceRecognizer(this, editText, this);
+        nlp = new NaturalLanguageProcessing(this);
 
         //Check Permissions
         voiceRec.checkPermission();
 
         //Create Speech Recognizer
-        voiceRec.setupSpeechRecognizer();
+         voiceRec.setupSpeechRecognizer();
 
         //Check if Screen is pressed
         rLayout.setOnTouchListener(new View.OnTouchListener() {
@@ -46,7 +56,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+    }
 
-
+    public void receiveData(String data) {
+        POSSample outputSample = nlp.analyse(data);
+        editText.setText(outputSample.toString());
     }
 }

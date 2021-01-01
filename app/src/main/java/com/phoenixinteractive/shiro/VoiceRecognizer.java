@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
-import android.speech.tts.TextToSpeech;
 import android.widget.EditText;
 
 import java.util.ArrayList;
@@ -24,33 +23,27 @@ import opennlp.tools.postag.POSSample;
 
 public class VoiceRecognizer extends AppCompatActivity {
 
+    //Field Declaration
+    MainActivity mainActivity;
+    Context context;
+    EditText editText;
     SpeechRecognizer speechRecognizer;
     Intent speechRecognizerIntent;
-    NaturalLanguageProcessing nlp;
-    LeapYearCalculator lyc;
-    TextToSpeechOutput tts;
-    EditText editText;
-    Activity activity;
-    Context context;
-    POSSample outputSample;
 
 
-    public VoiceRecognizer(Context context, Activity activity, EditText editText) {
+    public VoiceRecognizer(Context context, EditText editText, MainActivity mainActivity) {
 
         //initialize Objects
-        this.activity = activity;
+        this.mainActivity = mainActivity;
         this.context = context;
         this.editText = editText;
         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this.context);
         speechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-        nlp = new NaturalLanguageProcessing(context);
-        lyc = new LeapYearCalculator(context);
-        tts = new TextToSpeechOutput(context);
     }
 
     public void checkPermission() {
         if ((ContextCompat.checkSelfPermission(context,Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) && (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)) {
-            ActivityCompat.requestPermissions(activity ,new String[]{Manifest.permission.RECORD_AUDIO},1);
+            ActivityCompat.requestPermissions(mainActivity ,new String[]{Manifest.permission.RECORD_AUDIO},1);
         }
     }
 
@@ -97,11 +90,7 @@ public class VoiceRecognizer extends AppCompatActivity {
             public void onResults(Bundle bundle) {
                 if(bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION) != null) {
                     ArrayList<String> data = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-                    outputSample = nlp.analyse(data.get(0));
-                    String[] result = lyc.findDate(outputSample);
-                    tts.say("Der Monat " + result[1]  + " des Jahres " + result[2] + " hat " + result[0] + " Tage");
-                    editText.setText("Der Monat " + result[1]  + " des Jahres " + result[2] + " hat " + result[0] + " Tage");
-
+                    mainActivity.receiveData(data.get(0));
                 }
             }
 
